@@ -13,9 +13,10 @@ var listCommand = &cli.Command{
 	Usage: "list aws keypairs",
 	Flags: []cli.Flag{
 		&cli.StringSliceFlag{
-			Name:  "regions",
-			Value: cli.NewStringSlice(),
-			Usage: "regions to show keys in",
+			Name:    "regions",
+			Aliases: []string{"r"},
+			Value:   cli.NewStringSlice(),
+			Usage:   "regions to show keys in",
 		},
 	},
 	Action: func(cCtx *cli.Context) error {

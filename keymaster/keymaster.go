@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/schollz/progressbar/v3"
 )
 
 type Keymaster struct {
@@ -18,15 +19,21 @@ type Key struct {
 
 // MakeKeymaster creates a Keymaster object using shared config
 func MakeKeymaster() (*Keymaster, error) {
+	bar := progressbar.Default(1, "Connecting to AWS")
 	sess, err := session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	})
-	return &Keymaster{sess: sess}, err
+	if err != nil {
+		return nil, err
+	}
+	bar.Add(1)
+	return &Keymaster{sess: sess}, nil
 }
 
 // ListKeys returns all key-pairs in the given regions
 func (km *Keymaster) ListKeys(regions ...string) (map[string][]Key, error) {
 	var res = map[string][]Key{}
+	bar := progressbar.Default(int64(len(regions)), "Listing keys in given regions")
 	for _, region := range regions {
 		// Create ec2 service for each region
 		svc := ec2.New(km.sess, &aws.Config{Region: aws.String(region)})
@@ -38,6 +45,7 @@ func (km *Keymaster) ListKeys(regions ...string) (map[string][]Key, error) {
 		if err != nil {
 			return nil, err
 		}
+		bar.Add(1)
 		if len(result.KeyPairs) == 0 {
 			continue
 		}
@@ -78,6 +86,7 @@ func (km *Keymaster) CreateKey(region string, key Key) error {
 
 // GetAllRegions returns all AWS regions
 func (km *Keymaster) GetAllRegions() ([]string, error) {
+	bar := progressbar.Default(1, "Getting AWS regions")
 	svc := ec2.New(km.sess)
 
 	// Get all regions
@@ -91,6 +100,8 @@ func (km *Keymaster) GetAllRegions() ([]string, error) {
 	for i, region := range result.Regions {
 		regions[i] = *region.RegionName
 	}
+
+	bar.Add(1)
 
 	return regions, nil
 }
