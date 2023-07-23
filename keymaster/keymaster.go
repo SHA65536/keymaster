@@ -64,6 +64,7 @@ func (km *Keymaster) ListKeys(regions ...string) (map[string][]Key, error) {
 
 // CreateKey creates a key-pair in the given region using a key
 func (km *Keymaster) CreateKey(region string, key Key) error {
+	bar := progressbar.Default(2, "Creating key in new region")
 	svc := ec2.New(km.sess, &aws.Config{Region: aws.String(region)})
 
 	// Create key in new region
@@ -75,12 +76,18 @@ func (km *Keymaster) CreateKey(region string, key Key) error {
 	if err != nil {
 		return err
 	}
+	bar.Add(1)
 
 	// Add tag
 	_, err = svc.CreateTags(&ec2.CreateTagsInput{
 		Resources: []*string{result.KeyPairId},
 		Tags:      keymasterTags,
 	})
+	if err != nil {
+		return err
+	}
+
+	bar.Add(1)
 	return err
 }
 
