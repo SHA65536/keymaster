@@ -8,19 +8,20 @@ import (
 )
 
 var copyCommand = &cli.Command{
-	Name:  "copy",
-	Usage: "copy a keypair from one region to another",
+	Name:      "copy",
+	Usage:     "copy a keypair from one region to another",
+	ArgsUsage: "keyname",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:     "src-key",
-			Aliases:  []string{"sk"},
-			Usage:    "name of the source key",
+			Name:     "from",
+			Aliases:  []string{"sr"},
+			Usage:    "name of the source region",
 			Required: true,
 		},
 		&cli.StringFlag{
-			Name:     "src-region",
-			Aliases:  []string{"sr"},
-			Usage:    "name of the source region",
+			Name:     "to",
+			Aliases:  []string{"dr"},
+			Usage:    "name of the destination region",
 			Required: true,
 		},
 		&cli.StringFlag{
@@ -29,20 +30,14 @@ var copyCommand = &cli.Command{
 			Usage:    "name of the destination key",
 			Required: false,
 		},
-		&cli.StringFlag{
-			Name:     "dst-region",
-			Aliases:  []string{"dr"},
-			Usage:    "name of the destination region",
-			Required: true,
-		},
 	},
 	Action: func(cCtx *cli.Context) error {
 		// Create main keymaster object
 		var srcKey *keymaster.Key
-		var srcKeyName = cCtx.String("src-key")
+		var srcKeyName = cCtx.Args().Get(0)
 		var dstKeyName = cCtx.String("dst-key")
-		var srcRegion = cCtx.String("src-region")
-		var dstRegion = cCtx.String("dst-region")
+		var srcRegion = cCtx.String("from")
+		var dstRegion = cCtx.String("to")
 		if dstKeyName == "" {
 			dstKeyName = srcKeyName
 		}
