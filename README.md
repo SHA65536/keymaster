@@ -1,6 +1,10 @@
 # keymaster
 An AWS Keypair CLI Tool
 
+<p>
+    <img src="https://raw.githubusercontent.com/SHA65536/keymaster/main/.github/demo.gif" width="100%" alt="Keymaster Example">
+</p>
+
 ## Installation
 To get the tool, simply install using go:
 ```sh
